@@ -48,7 +48,7 @@ suppressPackageStartupMessages({
 ## Warning: package 'ngram' was built under R version 4.1.1
 ```
 
-To hide the code complexity, i have written a R script to calculate the required stats and store the outputs in RDS files. If you are interested in viewing in the R script, [click here]( https://github.com/PuneetSingla5822/Capstone/ExploratoryAnalysis.R)
+To hide the code complexity, i have written a R script to calculate the required stats and store the outputs in RDS files. If you are interested in viewing in the R script, [click here](https://github.com/PuneetSingla5822/Capstone/blob/main/ExploratoryAnalysis.R)
 
 
 ```r
