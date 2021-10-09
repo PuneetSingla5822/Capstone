@@ -1,0 +1,135 @@
+---
+title: "ExploratoryAnalysis"
+author: "Puneet Singla"
+date: "10/9/2021"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 3
+    keep_md: true
+    
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r packages, echo=TRUE}
+suppressPackageStartupMessages({
+  library(tidytext)
+  library(tidyverse)
+  library(stringr)
+  library(knitr)
+  library(wordcloud)
+  library(ngram)
+})
+```
+
+To hide the code complexity, i have written a R script to calculate the required stats and store the outputs in RDS files. If you are interested in viewing in the R script, [click here]( https://github.com/PuneetSingla5822/Capstone/ExploratoryAnalysis.R)
+
+```{r data, echo=TRUE}
+repo_summary <- readRDS("clean_repos/repo_summary.rds")
+tidy_repo <- readRDS("clean_repos/tidy_repo.rds")
+cover_90  <- readRDS("clean_repos/cover_90.rds")
+bigram_cover_90   <- readRDS("clean_repos/bigram_cover_90.rds")
+trigram_cover_90  <- readRDS("clean_repos/trigram_cover_90.rds")
+```
+
+## Introduction   
+This project analyzes the [HC Corpora Dataset](https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip) with the goal of creating a prediction model for predicting n-grams.  In this report, I will summarize the exploratory data analysis that i have conducted on the data.
+
+## File Summary   
+Data files provided are: blogs, news, and twitter. Here are few basic stats on the data files.
+
+```{r summary, echo=FALSE}
+knitr::kable(repo_summary)  
+```
+  
+To speed up the processing, I have sampled 10% of the lines from the each file. Each data sample was cleaned and broken into uni, bi and tri-grams. To further speed up the model, i have subsetted the n-grams to cover 90% of the sample phrases.
+
+## Uni-grams, word cloud  
+Next, we will create a word cloud to see the most frequent words in the data.
+
+```{r echo=TRUE}
+#' Word cloud
+cover_90 %>%
+  with(wordcloud(word, n, max.words = 100,
+                 colors = brewer.pal(8, 'Dark2'), random.order = FALSE))
+```
+
+## Uni-grms, By Source  
+Now, Let's look at the word frequencies in the data.
+
+```{r, echo = TRUE} 
+#' Word distribution by source
+freq <- tidy_repo %>%
+  count(source, word) %>%
+  group_by(source) %>%
+  mutate(proportion = n / sum(n)) %>%
+  spread(source, proportion) %>%
+  gather(source, proportion, `blogs`:`twitter`) %>%
+  arrange(desc(proportion), desc(n))
+freq %>%
+  filter(proportion > 0.002) %>% 
+  mutate(word = reorder(word, proportion)) %>% 
+  ggplot(aes(word, proportion)) +
+  geom_col(fill="blue") + 
+  xlab(NULL) + 
+  coord_flip() +
+  theme_light() +
+  facet_grid(~source, scales = "free")
+```
+
+## Uni-gram Distribution
+Distributions were created for each set of n-grams, based on relative frequency.
+
+```{r unigrams, echo=TRUE}
+#' Word distribution
+cover_90 %>%
+  top_n(20, proportion) %>%
+  mutate(word = reorder(word, proportion)) %>%
+  ggplot(aes(word, proportion)) +
+  geom_col(fill="blue") +
+  xlab(NULL) +
+  theme_light() +
+  coord_flip()
+```
+
+## Bi-gram Distribution
+```{r bigrams, echo=TRUE}
+#' Bigram distribution
+bigram_cover_90 %>%
+  top_n(20, proportion) %>%
+  mutate(bigram = reorder(bigram, proportion)) %>%
+  ggplot(aes(bigram, proportion)) +
+  geom_col(fill="blue") +
+  xlab(NULL) +
+  theme_light() +
+  coord_flip()
+```
+
+## Tri-gram Distribution
+```{r trigrams, echo=TRUE}
+#' trigram distribution
+trigram_cover_90 %>%
+  top_n(20, proportion) %>%
+  mutate(trigram = reorder(trigram, proportion)) %>%
+  ggplot(aes(trigram, proportion)) +
+  geom_col(fill="blue") +
+  xlab(NULL) +
+  theme_light() +
+  coord_flip()
+```
+
+## N-gram Prediction Model
+
+For the N-gram prediction model, I am going to use the n-gram tables created for bi-grams and tri-grams as the basis for prediction.  The user will input a word, the model will find the bi-gram with the greatest relative frequency given that word.  Similarly, the tri-gram table will be used for making predictions from two word entries and so on.  
+
+```{r, echo=TRUE}
+trigrams_separated <- trigram_cover_90 %>%
+  separate(trigram, c("word1", "word2", "word3"), sep = " ")
+knitr::kable(head(trigrams_separated))
+```
+
+In the above table, that the tri-grams are separated by word and arranged by relative frequency. When the user inputs two words, the model matches those words and then finds the third word with the greatest relative frequency.  Cases where there is no match, or where more than two words are entered, will have random completion.
+
