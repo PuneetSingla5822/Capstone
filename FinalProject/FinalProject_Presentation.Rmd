@@ -1,0 +1,47 @@
+---
+title: "Data Science Capstone: Predict the Next Word"
+author: "Puneet Singla"
+date: "October 17, 2021"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Introduction
+
+The key objective of this project was to create a simple text-prediction application using the R Shiny package. The application that I have built uses the n-gram model to predict the next word in the phrase.
+
+For training the model, I have used the corpus, a collection of written texts from Twitter, News, and Blogs in English.
+
+The size of the data dictionary was optimized by selecting the top combination of bi-, tri-, quad-, quint-, and sext- words.
+
+## Design of the Application
+
+The prediction model uses the principles of **tidy data** to perform text mining in R. The following key steps are involved in building this prediction model.
+
+1. Read the corpus data files, Twitter, blog, and news. This data will be used for training.
+2. Clean the raw data and separate it into 2, 3, 4, 5, and 6 words n-grams and save as tibbles
+3. Sort the n-grams tibbles by frequency and save the data as *.rds* files
+4. N-grams function uses a **back-off** type prediction model. This means, a user supplies an input phrase, and based on the number of words supplied, the model uses the last 5, 4, 3, 2, or 1 word to predict the best 6th, 5th, 4th, 3rd, or 2nd word respectively.
+5. Predicted word is displayed to the user
+
+## Introducing: Predict the Next Word App
+
+**Predict the Next Word** app provides a simple user interface to the Prediction algorithm.
+Using this app is super simple. Just go to the text box and enter your word or phrase, and hit "Nextword".
+
+Here is a preview of the app:
+
+```{r echo=FALSE} 
+knitr::include_graphics("AppScreenshot.png")
+```
+
+## Reference & Link to the app
+
+[Tidy Data](http://vita.had.co.nz/papers/tidy-data.html)
+
+[Text Mining with R: A Tidy Approach](http://tidytextmining.com/index.html)
+
+[Predict the Next Word App](https://puneetsingla.shinyapps.io/FinalProject/)

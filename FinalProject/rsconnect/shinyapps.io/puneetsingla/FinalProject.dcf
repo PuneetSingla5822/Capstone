@@ -1,0 +1,14 @@
+name: FinalProject
+title: FinalProject
+username:
+account: puneetsingla
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 4895349
+bundleId: 5149748
+url: https://puneetsingla.shinyapps.io/FinalProject/
+when: 1634555754.08486
+lastSyncTime: 1634555754.08486
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: FinalProject_Presentation.html|FinalProject_Presentation.Rmd
